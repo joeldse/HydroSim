@@ -1,13 +1,13 @@
 import numpy as np
+import pandas as pd
 
-#phydro["k1"]["Rietema"]
 
-def measures(dc, hydro):
-  bc = dc*hydro["bc_dc"]
-  do = dc*hydro.do_dc
-  hc = dc*hydro.l_dc
-  l = dc*hydro.lc_dc
-  sc = dc*hydro.sc_dc
+def measures(dc, hydro, phydro):
+  bc = dc*phydro["bc_dc"][hydro]
+  do = dc*phydro["do_dc"][hydro]
+  hc = dc*phydro["l_dc"][hydro]
+  l = dc*phydro["lc_dc"][hydro]
+  sc = dc*phydro["sc_dc"][hydro]
   return bc, do, hc, l, sc
 
 
@@ -16,33 +16,30 @@ def Reynolds(dc, mu, rho, q):
   return Re
 
 
-def Euler(cv, phydro, Re):
-  Eu = (phydro.k2)*Re^(phydro.n3)*np.exp((phydro.n4)*cv)
+
+def Euler(cv, hydro, phydro, Re):
+  Eu = phydro["k2"][hydro]*Re**phydro["n3"][hydro]*np.exp(phydro["n4"][hydro]*cv)
   return Eu
 
 
 
-def WaterFlowRatio(dc, du, Eu, hydro):
-  if hydro == "Rietema":
-    k3 = 1218; n5 = 4.75; n6 = -0.30;
-  if hydro == "Bradley":
-    k3 = 1.21*10^6; n5 = 2.63; n6 = -1.12;
-  if hydro == "Demco4H":
-    k3 = 0.127; n5 = 0.78; n5 = 0.00;
-
-  Rw = k3*(du/dc)^n5*Eu^n6
+def WaterFlowRatio(dc, Du, Eu, hydro, phydro):
+  Rw = phydro["k3"][hydro]*(Du/dc)**phydro["n5"][hydro]*Eu**phydro["n6"][hydro]
   return Rw
 
 
 
-def StkEu(cv, dc, do, l, rw, sc): #bc = di, l = Sc, l1 = lc
-  StkEu = 0.12*(dc/do)^0.95*(dc/(l-sc))^1.33*(np.log(1/rw))^0.79*np.exp(12.0*cv)
+def StokesEulerNumber(cv, hydro, phydro, Rw): #bc = di, l = Sc, l1 = lc
+  StkEu = phydro["k1"][hydro]*(np.log(1/Rw))**phydro["n1"][hydro]*np.exp(phydro["n2"][hydro]*cv)
   return StkEu
 
 
-def du(dc, do, dp, rho, q, rw):
-  du = 0.983*(dc^1.926/do^0.229)*(dp/(rho*q^2))^0.174*rw^0.323
-  return du
+
+def ReducedCutSize(dc, dp, mu, q, rho, rhos, StkEu):
+  d50 = np.sqrt(36*StkEu*mu*rho*q/(dp*dc*np.pi*(rhos-rho)))
+  return d50
+
+
 
 
 

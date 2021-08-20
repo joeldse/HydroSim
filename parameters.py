@@ -8,11 +8,14 @@ config.read("properties.conf")
 for experiment in config.sections():
     file = config.get(experiment, "file")
     hydro = config.get(experiment, "hydrocyclone")
+    cv = config.getfloat(experiment, "cv")
+    dc = config.getfloat(experiment, "Dc")
+    dp = config.getfloat(experiment, "dP")
+    Du = config.getfloat(experiment, "Du")
+    mu = config.getfloat(experiment, "mu")
     q = config.getfloat(experiment, "Q")
     rho = config.getfloat(experiment, "rho")
-    mu = config.getfloat(experiment, "mu")
-    dc = config.getfloat(experiment, "Dc")
-    cv = config.getfloat(experiment, "cv")
+    rhos = config.getfloat(experiment, "rhos")
 
 data = pd.read_csv(file, sep=';')
 
