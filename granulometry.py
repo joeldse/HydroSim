@@ -1,19 +1,39 @@
-def rrb():
-    a = 1.4
-    b = 1.5
-    r = 0.99
-    return a,b,r
+import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
-def ggs():
-    a = 1.4
-    b = 1.5
-    r = 0.99
-    return a,b,r
+def LRegression(x, y):
+    #x, y = np.array(x), np.array(y)
+    model = LinearRegression().fit(x, y)
+    return model
 
 
-def sigmoide():
-    a = 1.4
-    b = 1.5
-    r = 0.99
-    return a,b,r
+
+def rrb(x, y):
+    x = np.log(x)
+    y = np.log(np.log(1/(1-y)))
+    model = LRegression(x, y)
+    m = model.coef_
+    k = np.exp(-model.intercept_/m)/1e6
+    r2 = model.score(x, y)
+    return m, k, r2
+
+
+def ggs(x, y):
+    x = np.log(x)
+    y = np.log(y)
+    model = LRegression(x, y)
+    m = model.coef_
+    k = np.exp(-model.intercept_/m)/1e6
+    r2 = model.score(x, y)
+    return m, k, r2
+
+
+def sigmoide(x, y):
+    x = np.log(x)
+    y = -np.log(1/y-1)
+    model = LRegression(x, y)
+    m = model.coef_
+    k = np.exp(-model.intercept_/m)/1e6
+    r2 = model.score(x, y)
+    return m, k, r2

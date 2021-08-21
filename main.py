@@ -2,7 +2,6 @@
 from parameters import *
 from granulometry import *
 from hydrocyclones import * 
-import numpy as np
 
 
 # cálculo das variáveis
@@ -10,15 +9,19 @@ bc, do, hc, l, sc = measures(dc, hydro, phydro)
 Re = Reynolds(dc, mu, rho, q)
 Eu = Euler(cv, hydro, phydro, Re)
 Rw = WaterFlowRatio(dc, Du, Eu, hydro, phydro)
-StkEu = StokesEulerNumber(cv, hydro, phydro, Rw)        #diverse um pouco
+StkEu = StokesEulerNumber(cv, hydro, phydro, Rw)
 d50 = ReducedCutSize(dc, dp, mu, q, rho, rhos, StkEu)
+m, k, r2 = rrb(x_exp, y_exp)
+
 
 
 # Impressão dos resultados
-print(Re, Eu, Rw, StkEu, d50)
-print(phydro["n1"][hydro])
-print(data.iloc[0,1])
-print(phydro["k1"][hydro])
+print(f" Re: {Re:.2f}, Eu: {Eu:.2f}, Rw: {Rw:.2f}, StkEu: {StkEu:.2f}, d50: {d50*10**6:.2f}e-6")
+print(m, k, r2)
 
-# continuar em WaterFlowRatio
+
+
 # parametrização - Dc, Du, dP, Q, hydrocyclone
+
+# links
+# https://www.youtube.com/watch?v=GYFj52Jfkkg&list=PLsqyc_Q78CdhJ9WNATYaUs1oWk2bsdUuu

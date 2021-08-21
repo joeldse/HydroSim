@@ -1,5 +1,4 @@
 import numpy as np
-import pandas as pd
 
 
 def measures(dc, hydro, phydro):
@@ -19,12 +18,14 @@ def Reynolds(dc, mu, rho, q):
 
 def Euler(cv, hydro, phydro, Re):
   Eu = phydro["k2"][hydro]*Re**phydro["n3"][hydro]*np.exp(phydro["n4"][hydro]*cv)
+  #Eu = 43.5*dc^0.57*(dc/bc)^2.61*(dc/(do^2+du^2))^0.42*(dc/(l-sc))^0.98*Re^0.12*np.exp(-0.51*cv)
   return Eu
 
 
 
 def WaterFlowRatio(dc, Du, Eu, hydro, phydro):
   Rw = phydro["k3"][hydro]*(Du/dc)**phydro["n5"][hydro]*Eu**phydro["n6"][hydro]
+  #Rw = 1.18*(dc/do)^5.97*(du/dc)^3.10*Eu^(-0.54)
   return Rw
 
 
@@ -40,15 +41,3 @@ def ReducedCutSize(dc, dp, mu, q, rho, rhos, StkEu):
   return d50
 
 
-
-
-
-
-
-def Euler2(bc, cv, dc, du, do, l, Re, sc):
-  Eu = 43.5*dc^0.57*(dc/bc)^2.61*(dc/(do^2+du^2))^0.42*(dc/(l-sc))^0.98*Re^0.12*np.exp(-0.51*cv)
-  return Eu
-
-def WaterFlowRatio2(dc, do, du, Eu):
-  Rw = 1.18*(dc/do)^5.97*(du/dc)^3.10*Eu^(-0.54)
-  return Rw

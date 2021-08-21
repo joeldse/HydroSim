@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import configparser
 
@@ -6,21 +7,24 @@ config = configparser.ConfigParser()
 config.read("properties.conf")
 
 for experiment in config.sections():
-    file = config.get(experiment, "file")
-    hydro = config.get(experiment, "hydrocyclone")
     cv = config.getfloat(experiment, "cv")
     dc = config.getfloat(experiment, "Dc")
     dp = config.getfloat(experiment, "dP")
     Du = config.getfloat(experiment, "Du")
+    file = config.get(experiment, "file")
+    granulometry = config.get(experiment, "granulometry")
+    hydro = config.get(experiment, "hydrocyclone")
     mu = config.getfloat(experiment, "mu")
     q = config.getfloat(experiment, "Q")
     rho = config.getfloat(experiment, "rho")
     rhos = config.getfloat(experiment, "rhos")
 
-data = pd.read_csv(file, sep=';')
+data = pd.read_csv(file, sep=',')
+x_exp = np.array(data.iloc[:,0].to_frame().T).reshape((-1, 1))
+y_exp = np.array(data.iloc[:,1])
 
 
-# Constantes
+# Constantes dos hidrociclones
 phydro = pd.DataFrame(
   {
     "bc_dc": [0.28, 1/7, 0.26],
