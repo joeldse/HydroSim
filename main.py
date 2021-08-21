@@ -1,6 +1,5 @@
 #Bibliotecas
 from parameters import *
-from granulometry import *
 from hydrocyclones import * 
 
 
@@ -11,8 +10,7 @@ Eu = Euler(cv, hydro, phydro, Re)
 Rw = WaterFlowRatio(dc, Du, Eu, hydro, phydro)
 StkEu = StokesEulerNumber(cv, hydro, phydro, Rw)
 d50 = ReducedCutSize(dc, dp, mu, q, rho, rhos, StkEu)
-m, k, r2 = rrb(x_exp, y_exp)
-
+m, k, r2 = DistrGranul(x_exp, y_exp, granulometry)
 
 
 # Impressão dos resultados

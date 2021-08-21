@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.linear_model import LinearRegression
 
 
 def measures(dc, hydro, phydro):
@@ -40,4 +41,21 @@ def ReducedCutSize(dc, dp, mu, q, rho, rhos, StkEu):
   d50 = np.sqrt(36*StkEu*mu*rho*q/(dp*dc*np.pi*(rhos-rho)))
   return d50
 
+
+
+
+def DistrGranul(x, y, granulometry):
+    if granulometry == "RRB":
+        y = np.log(np.log(1/(1-y)))
+    if granulometry == "GGS":
+        y = np.log(y)
+    if granulometry == "sigmoide":
+        y = -np.log(1/y-1)
+    
+    x = np.log(x)
+    model = LinearRegression().fit(x, y)
+    m = model.coef_
+    k = np.exp(-model.intercept_/m)
+    r2 = model.score(x, y)
+    return m, k, r2
 
