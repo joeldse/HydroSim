@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression
+from scipy.integrate import quad
 
 
 def measures(dc, hydro, phydro):
@@ -9,6 +10,17 @@ def measures(dc, hydro, phydro):
   l = dc*phydro["lc_dc"][hydro]
   sc = dc*phydro["sc_dc"][hydro]
   return bc, do, hc, l, sc
+
+
+#bc = di, l = Sc, l1 = lc
+def FeedVolumetricFlowRate(dc, dp, mu, rho, cv, hydro):
+  if hydro == "Bradley":
+    q = (dc*mu**(0.085)*dp**0.23*np.exp(0*cv)/(3.5*rho**0.31))**(1/0.54)
+  if hydro == "Rietema":
+    q = (dc*mu**0.028*dp**0.24*np.exp(-0.52*cv)/(4*rho**0.27))**(1/0.51)
+  if hydro == "Demco4H":
+    q = (dc*mu**0.028*dp**0.24*np.exp(-0.52*cv)/(4*rho**0.27))**(1/0.51)
+  return q
 
 
 def Reynolds(dc, mu, rho, q):
@@ -31,8 +43,9 @@ def WaterFlowRatio(dc, Du, Eu, hydro, phydro):
 
 
 
-def StokesEulerNumber(cv, hydro, phydro, Rw): #bc = di, l = Sc, l1 = lc
-  StkEu = phydro["k1"][hydro]*(np.log(1/Rw))**phydro["n1"][hydro]*np.exp(phydro["n2"][hydro]*cv)
+def StokesEulerNumber(cv, hydro, phydro, Rw):
+  StkEu = phydro["k1"][hydro]*np.exp(phydro["n2"][hydro]*cv)*np.log(1/Rw)**phydro["n1"][hydro]
+  #np.log(Rw)**phydro["n1"][hydro]
   return StkEu
 
 
@@ -40,7 +53,6 @@ def StokesEulerNumber(cv, hydro, phydro, Rw): #bc = di, l = Sc, l1 = lc
 def ReducedCutSize(dc, dp, mu, q, rho, rhos, StkEu):
   d50 = np.sqrt(36*StkEu*mu*rho*q/(dp*dc*np.pi*(rhos-rho)))
   return d50
-
 
 
 
@@ -59,3 +71,15 @@ def DistrGranul(x, y, granulometry):
     r2 = model.score(x, y)
     return m, k, r2
 
+
+
+def ReducedEfficiency(x, a, m, k, d50, granulometry):
+  if granulometry == "RRB":
+    y = 1 - np.exp(-0.693*(k/d50)**a*np.log(1/(1-x))**(a/m))
+  return y
+
+
+
+def underflow(cv, Et, Rw):
+  cvu = Et*cv/(Rw-Rw*cv+Et*cv)
+  return cvu

@@ -15,7 +15,7 @@ for experiment in config.sections():
     granulometry = config.get(experiment, "granulometry")
     hydro = config.get(experiment, "hydrocyclone")
     mu = config.getfloat(experiment, "mu")
-    q = config.getfloat(experiment, "Q")
+    qt = config.getfloat(experiment, "Q")/3600
     rho = config.getfloat(experiment, "rho")
     rhos = config.getfloat(experiment, "rhos")
 
@@ -32,7 +32,7 @@ phydro = pd.DataFrame(
     "l_dc": [5, 0, 3.3],
     "lc_dc": [0, 1/2, 0.55],
     "sc_dc": [0.4, 1/3, 0.55],
-    "theta": [20, 9, 18],
+    "theta": [20, 9, 20],
     "k1": [0.0474, 0.0550, 0.0088],
     "k2": [371.5, 258, 3300],
     "k3": [1218, 1.21e6, 0.127],
@@ -42,6 +42,7 @@ phydro = pd.DataFrame(
     "n4": [-2.12, 0.00, 0.00],
     "n5": [4.75, 2.63, 0.78],
     "n6": [-0.30, -1.12, 0.00],
+    "m": [2.45, 3.12, 3.30],
   }, index= ["Rietema", "Bradley", "Demco4H"]
 )
 
