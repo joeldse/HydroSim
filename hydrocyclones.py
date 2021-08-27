@@ -12,7 +12,7 @@ def measures(dc, hydro, phydro):
   return bc, do, hc, l, sc
 
 
-#bc = di, l = Sc, l1 = lc
+# Corrigir Demco - bc = di, l = Sc, l1 = lc
 def FeedVolumetricFlowRate(dc, dp, mu, rho, cv, hydro):
   if hydro == "Bradley":
     q = (dc*mu**(0.085)*dp**0.23*np.exp(0*cv)/(3.5*rho**0.31))**(1/0.54)
@@ -20,6 +20,10 @@ def FeedVolumetricFlowRate(dc, dp, mu, rho, cv, hydro):
     q = (dc*mu**0.028*dp**0.24*np.exp(-0.52*cv)/(4*rho**0.27))**(1/0.51)
   if hydro == "Demco4H":
     q = (dc*mu**0.028*dp**0.24*np.exp(-0.52*cv)/(4*rho**0.27))**(1/0.51)
+  return q
+
+def FeedVolumetricFlowRate1(bc, cv, dc, do, dp, Du, l, sc):
+  q = 0.00133*dp**0.56*dc**0.21*bc**0.53*(l-sc)**0.16*(Du**2 + do**2)**0.49*np.exp(-0.31*cv)
   return q
 
 
@@ -76,6 +80,10 @@ def DistrGranul(x, y, granulometry):
 def ReducedEfficiency(x, a, m, k, d50, granulometry):
   if granulometry == "RRB":
     y = 1 - np.exp(-0.693*(k/d50)**a*np.log(1/(1-x))**(a/m))
+  if granulometry == "GGS":
+    y = 1 - np.exp(-0.693*(k/d50)**a*x**(a/m))
+  if granulometry == "sigmoide":
+    y = 1 - np.exp(-0.693*(k/d50)**a*(x/(1-x))**(a/m))
   return y
 
 

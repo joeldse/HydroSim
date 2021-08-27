@@ -19,12 +19,13 @@ for experiment in config.sections():
     rho = config.getfloat(experiment, "rho")
     rhos = config.getfloat(experiment, "rhos")
 
+# experimental values of granulometry
 data = pd.read_csv(file, sep=',')
 x_exp = np.array(data.iloc[:,0].to_frame().T).reshape((-1, 1))
 y_exp = np.array(data.iloc[:,1])
 
 
-# Constantes dos hidrociclones
+# Hydrocyclone constants
 phydro = pd.DataFrame(
   {
     "bc_dc": [0.28, 1/7, 0.26],
