@@ -13,7 +13,7 @@ for experiment in config.sections():
     Du = config.getfloat(experiment, "Du")
     file = config.get(experiment, "file")
     granulometry = config.get(experiment, "granulometry")
-    hydro = config.get(experiment, "hydrocyclone")
+    hydro = config.get(experiment, "family")
     mu = config.getfloat(experiment, "mu")
     qt = config.getfloat(experiment, "Q")/3600
     rho = config.getfloat(experiment, "rho")
