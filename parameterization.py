@@ -6,8 +6,9 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 from matplotlib import cm
 from hydrocyclones import *
 
-def parameterization(cv, dc, dp, Du, granulometry, k, mu, n, hydro, phydro, rho, rhos):
-    interval = 5; dc = 0.06; dcf = 0.1;  Du = 0.006; Duf = 0.015; dp = 344750.0; dpf = 349750.0
+
+def parameterization(cv, dc, dp, Du, granulometry, k, mu, n, hydro, phydro, qt, rho, rhos):
+    interval = 3; dc = 0.06; dcf = 0.1;  Du = 0.006; Duf = 0.015; dp = 344750.0; dpf = 349750.0
     df = pd.DataFrame({'Dc' : []})
     for i in range(1,interval+1):
         dc = dc + (i-1)*(dcf-dc)/2
@@ -15,7 +16,7 @@ def parameterization(cv, dc, dp, Du, granulometry, k, mu, n, hydro, phydro, rho,
             Du = Du + (j-1)*(Duf - Du)/2
             for t in range(1, interval+1):
                 dp = dp + (t-1)*(dpf - dp)/2
-                x = calc(cv, dc, dp, Du, granulometry, k, mu, n, hydro, phydro, rho, rhos)
+                x = calc(cv, dc, dp, Du, granulometry, hydro, k, mu, n, phydro, qt, rho, rhos)
                 df = df.append({'Dc': dc, 'Du': Du, 'dP': dp, 'Q': x[0], 'Re': x[1], 'd50': x[5], 
                 'Cvu': x[9], 'Et\'': x[6], 'Et': x[8], 'Bc': x[10], 'Do': x[11], 'Hc': x[12],
                 'L': x[13], 'Sc': x[14]}, ignore_index=True)
@@ -51,6 +52,8 @@ def graphic(df):
 def graphic2D(df):
     des = 1
     return des
+
+
 
 
 

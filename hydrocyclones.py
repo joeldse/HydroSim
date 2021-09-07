@@ -20,26 +20,31 @@ def DistrGranul(x, y, granulometry):
 
 
 
-def measures(dc, hydro, phydro):
-  bc = dc*phydro["bc_dc"][hydro]
-  do = dc*phydro["do_dc"][hydro]
-  hc = dc*phydro["l_dc"][hydro]
-  l = dc*phydro["lc_dc"][hydro]
-  sc = dc*phydro["sc_dc"][hydro]
+def measures(dc, family, phydro):
+  bc = dc*phydro["bc_dc"][family]
+  do = dc*phydro["do_dc"][family]
+  hc = dc*phydro["l_dc"][family]
+  l = dc*phydro["lc_dc"][family]
+  sc = dc*phydro["sc_dc"][family]
   return bc, do, hc, l, sc
 
 
 # Corrigir Demco - bc = di, l = Sc, l1 = lc
-def FeedVolumetricFlowRate(dc, dp, mu, rho, cv, hydro):
-  if hydro == "Bradley":
-    q = (dc*mu**(0.085)*dp**0.23*np.exp(0*cv)/(3.5*rho**0.31))**(1/0.54)
-  if hydro == "Rietema":
-    q = (dc*mu**0.028*dp**0.24*np.exp(-0.52*cv)/(4*rho**0.27))**(1/0.51)
-  if hydro == "Demco4H":
-    q = (dc*mu**0.028*dp**0.24*np.exp(-0.52*cv)/(4*rho**0.27))**(1/0.51)
+def FeedVolumetricFlowRate(dc, dp, mu, rho, cv, family):
+  if family == "Bradley":
+    q = (dc*mu**(0.085)*dp**0.23/(3.5*rho**0.31*np.exp(0*cv)))**(1/0.54)
+  if family == "Rietema":
+    q = (dc*mu**0.028*dp**0.24/(4*rho**0.27*np.exp(-0.52*cv)))**(1/0.51)
+  if family == "Demco4H":
+    q = (dc*mu**0.028*dp**0.24/(4*rho**0.27*np.exp(-0.52*cv)))**(1/0.51)
   #q = 0.00133*dp**0.56*dc**0.21*bc**0.53*(l-sc)**0.16*(Du**2 + do**2)**0.49*np.exp(-0.31*cv)
   return q
 
+
+
+
+def NumHydro(qt, q):
+  return qt/q
 
 
 def Reynolds(dc, mu, rho, q):
@@ -92,10 +97,15 @@ def underflow(cv, Et, Rw):
 
 
 
-def calc(cv, dc, dp, Du, granulometry, k, mu, n, hydro, phydro, rho, rhos):
+def Status():
+  return
+
+
+def calc(cv, dc, dp, Du, granulometry, hydro, k, mu, n, phydro, qt, rho, rhos):
     result = []
     bc, do, hc, l, sc = measures(dc, hydro, phydro)
     q = FeedVolumetricFlowRate(dc, dp, mu, rho, cv, hydro)
+    nhydro = NumHydro(qt, q)
     Re = Reynolds(dc, mu, rho, q)
     Eu = Euler(cv, hydro, phydro, Re)
     Rw = WaterFlowRatio(dc, Du, Eu, hydro, phydro)
@@ -104,5 +114,5 @@ def calc(cv, dc, dp, Du, granulometry, k, mu, n, hydro, phydro, rho, rhos):
     Etr, err = quad(ReducedEfficiency, 0, 1, args=(phydro["m"][hydro], n, k, 1e6*d50, granulometry))
     Et = Rw + Etr*(1 - Rw)
     cvu = underflow(cv, Et, Rw)
-    result = [q, Re, Eu, Rw, StkEu, 1e6*d50, Etr, err, Et, cvu, bc, do, hc, l, sc]
+    result = [q, Re, Eu, Rw, StkEu, 1e6*d50, Etr, err, Et, cvu, bc, do, hc, l, sc, nhydro]
     return result
