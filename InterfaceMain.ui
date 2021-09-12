@@ -26,7 +26,7 @@
       <x>560</x>
       <y>0</y>
       <width>171</width>
-      <height>371</height>
+      <height>391</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -35,8 +35,8 @@
     <widget class="QSplitter" name="splitter">
      <property name="geometry">
       <rect>
-       <x>10</x>
-       <y>340</y>
+       <x>20</x>
+       <y>360</y>
        <width>150</width>
        <height>23</height>
       </rect>
@@ -433,7 +433,7 @@
       <x>0</x>
       <y>0</y>
       <width>161</width>
-      <height>371</height>
+      <height>391</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -677,8 +677,23 @@
      </attribute>
     </widget>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>270</x>
+      <y>20</y>
+      <width>191</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">image: url(:/img/Hydrocyclone-fonctionnement.png);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -750,7 +765,9 @@
    <addaction name="menuSettings"/>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="Interface/img/img.qrc"/>
+ </resources>
  <connections/>
  <buttongroups>
   <buttongroup name="buttonGroup"/>

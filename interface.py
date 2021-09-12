@@ -1,4 +1,11 @@
-from PyQt5 import uic, QtWidgets
+#from PyQt5 import uic, QtWidgets
+from PyQt5.QtWidgets import *
+from PyQt5.Qt import Qt
+from PyQt5.QtCore import pyqtSlot
+from PyQt5 import uic, QtCore, QtGui, QtWidgets
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtPrintSupport import *
+import os, sys
 
 def data():
     dc = interfaceGran.lineEdit_PDc.text()
@@ -31,6 +38,8 @@ def data():
         graphics = "2D"
     elif interfaceGran.radioButton_3D.isChecked():
         graphics = "3D"
+    else:
+        graphics = "2D"
     print(dc, Du, rho, rhos, mu, dp, qt, cv, granulometry, family, graphics)
     return
 
@@ -39,7 +48,8 @@ def reset():
 
 
 app = QtWidgets.QApplication([])
-interfaceGran = uic.loadUi("InterfaceMain.ui")
+QtGui.QIcon(":/Interface/image/Hydrocyclone-fonctionnement.png")
+interfaceGran = uic.loadUi("Interface/parameterization.ui")
 interfaceGran.ButtonReset.clicked.connect(reset)
 interfaceGran.ButtonRun.clicked.connect(data)
 
