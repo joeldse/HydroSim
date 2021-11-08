@@ -7,22 +7,22 @@ config = configparser.ConfigParser()
 config.read("properties.conf")
 
 for experiment in config.sections():
-    cv = config.getfloat(experiment, "cv")
-    dc = config.getfloat(experiment, "Dc")
-    dp = config.getfloat(experiment, "dP")
-    Du = config.getfloat(experiment, "Du")
     file = config.get(experiment, "file")
-    granulometry = config.get(experiment, "granulometry")
-    family = config.get(experiment, "family")
-    mu = config.getfloat(experiment, "mu")
-    qt = config.getfloat(experiment, "Q")/3600
-    rho = config.getfloat(experiment, "rho")
-    rhos = config.getfloat(experiment, "rhos")
 
 # experimental values of granulometry
 data = pd.read_csv(file, sep=',')
 x_exp = np.array(data.iloc[:,0].to_frame().T).reshape((-1, 1))
 y_exp = np.array(data.iloc[:,1])
+
+
+
+for experiment in config.sections():
+    file = config.get(experiment, "fileresults")
+# experimental values of granulometry
+data = pd.read_csv(file, sep=',')
+x_res = np.array(data.iloc[0,0])
+y_res = np.array(data.iloc[:,1])
+
 
 
 # Hydrocyclone constants

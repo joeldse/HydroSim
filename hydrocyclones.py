@@ -116,3 +116,4 @@ def calc(cv, dc, dp, Du, granulometry, hydro, k, mu, n, phydro, qt, rho, rhos):
     cvu = underflow(cv, Et, Rw)
     result = [q, Re, Eu, Rw, StkEu, 1e6*d50, Etr, err, Et, cvu, bc, do, hc, l, sc, nhydro]
     return result
+
