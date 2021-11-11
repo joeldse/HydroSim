@@ -1,29 +1,4 @@
-import numpy as np
 import pandas as pd
-import configparser
-
-#recolhimento de dados experimentais
-config = configparser.ConfigParser()
-config.read("properties.conf")
-
-for experiment in config.sections():
-    file = config.get(experiment, "file")
-
-# experimental values of granulometry
-data = pd.read_csv(file, sep=',')
-x_exp = np.array(data.iloc[:,0].to_frame().T).reshape((-1, 1))
-y_exp = np.array(data.iloc[:,1])
-
-
-
-for experiment in config.sections():
-    file = config.get(experiment, "fileresults")
-# experimental values of granulometry
-data = pd.read_csv(file, sep=',')
-x_res = np.array(data.iloc[0,0])
-y_res = np.array(data.iloc[:,1])
-
-
 
 # Hydrocyclone constants
 phydro = pd.DataFrame(

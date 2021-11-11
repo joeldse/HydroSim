@@ -1,22 +1,30 @@
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 from scipy.integrate import quad
+from cost import *
+from parameters import *
 
+def DistrGranul(granulometry):
+  #Obtaining User Parameters
+  df = pd.read_csv('Granulometric_Data.csv', sep=',')
+  x = np.array(df.iloc[:,0].to_frame().T).reshape((-1, 1))
+  y = np.array(df.iloc[:,1])
 
-def DistrGranul(x, y, granulometry):
-    if granulometry == "RRB":
-        y = np.log(np.log(1/(1-y)))
-    if granulometry == "GGS":
-        y = np.log(y)
-    if granulometry == "sigmoide":
-        y = -np.log(1/y-1)
+  # experimental values of granulometry
+  if granulometry == "RRB":
+    y = np.log(np.log(1/(1-y)))
+  if granulometry == "GGS":
+    y = np.log(y)
+  if granulometry == "sigmoide":
+    y = -np.log(1/y-1)
     
-    x = np.log(x)
-    model = LinearRegression().fit(x, y)
-    m = model.coef_
-    k = np.exp(-model.intercept_/m)
-    r2 = model.score(x, y)
-    return m, k, r2
+  x = np.log(x)
+  model = LinearRegression().fit(x, y)
+  m = model.coef_
+  k = np.exp(-model.intercept_/m)
+  r2 = model.score(x, y)
+  return m, k, r2
 
 
 
@@ -37,14 +45,14 @@ def FeedVolumetricFlowRate(dc, dp, mu, rho, cv, family):
     q = (dc*mu**0.028*dp**0.24/(4*rho**0.27*np.exp(-0.52*cv)))**(1/0.51)
   if family == "Demco4H":
     q = (dc*mu**0.028*dp**0.24/(4*rho**0.27*np.exp(-0.52*cv)))**(1/0.51)
-  #q = 0.00133*dp**0.56*dc**0.21*bc**0.53*(l-sc)**0.16*(Du**2 + do**2)**0.49*np.exp(-0.31*cv)
+    #q = 0.00133*dp**0.56*dc**0.21*bc**0.53*(l-sc)**0.16*(Du**2 + do**2)**0.49*np.exp(-0.31*cv)
   return q
 
 
 
 
 def NumHydro(qt, q):
-  return qt/q
+  return qt/(3600*q)
 
 
 def Reynolds(dc, mu, rho, q):
@@ -114,6 +122,11 @@ def calc(cv, dc, dp, Du, granulometry, hydro, k, mu, n, phydro, qt, rho, rhos):
     Etr, err = quad(ReducedEfficiency, 0, 1, args=(phydro["m"][hydro], n, k, 1e6*d50, granulometry))
     Et = Rw + Etr*(1 - Rw)
     cvu = underflow(cv, Et, Rw)
-    result = [q, Re, Eu, Rw, StkEu, 1e6*d50, Etr, err, Et, cvu, bc, do, hc, l, sc, nhydro]
+    cp = TotalCost(560, q)
+    cbm = BareModuleCost(cp)
+    result = [q, Re, Eu, Rw, StkEu, 1e6*d50, Etr, err, Et, cvu, bc, do, hc, l, sc, nhydro, cp, cbm]
     return result
+
+
+
 

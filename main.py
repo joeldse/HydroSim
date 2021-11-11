@@ -6,7 +6,6 @@ from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import *
 from PyQt5.QtPrintSupport import *
 import numpy as np
-import pandas as pd
 import csv
 import os, sys
 
@@ -63,64 +62,79 @@ class IntSim(QMainWindow):
         qt = self.ui.lineEditQ.text()
         rho = self.ui.lineEditRho.text()
         rhos = self.ui.lineEditRhos.text()
-        dc, cv, dp, Du = 0.06, 0.01, 344750, 0.008
-        mu, qt, rho, rhos = 0.001, 50/3600, 1000, 2700
-        dc = float(dc)
+        #dc, cv, Du, dp = 6, 0.01, 0.8, 3.4023
+        #mu, qt, rho, rhos = 1, 50, 1000, 2800
+        #dc, cv, Du, dp = 1, 0.0025, 0.15, 2
+        #mu, qt, rho, rhos = 1, 50, 996.02, 997.27
+
+        dc = float(dc)/100
         cv = float(cv)
-        dp = float(dp)
-        Du = float(Du)
-        mu = float(mu)
+        dp = float(dp)*101325
+        Du = float(Du)/100
+        mu = float(mu)/1000
         qt = float(qt)
         rho = float(rho)
         rhos = float(rhos)
         return dc, cv, dp, Du, mu, qt, rho, rhos
 
-    def OptimizationParameter(self):
-        if self.ui.radioButtonOptim.isChecked():
-            optimization = "Y"
-            variance = self.ui.lineEditVariance.text()
-            variance = float(variance)
-        else:
-            optimization = "N"
-            variance = 0
-        return optimization, variance
-
     def GranulometricDataParameter(self):
-        rowcount = self.ui.tableWidget.rowCount()
-        columncount = 2
-        for row in range(rowcount):
-            for column in range(columncount):
-                widgetitem = self.ui.tableWidget.item(row,column)
-        return widgetitem
+        list = []
+        tam = 0
+        for i in range(50):
+            if self.ui.tableWidget.item(i, 0) != None:
+                tam += 1
+        for i in range(tam):  #linha
+            for j in range(2):
+                item = self.ui.tableWidget.item(i, j)
+                value = float(item.text())
+                list.append(value)
+        
+        #Saving as CSV
+        f = open('Granulometric_Data.csv', 'w', newline='', encoding='utf-8')  # 1. cria o arquivo
+        w = csv.writer(f)                                           # 2. cria o objeto de gravação
+        w.writerow(["d", "y"])
+        for i in range(tam):
+            w.writerow([list[2*i], list[2*i+1]])
+        return list
     
     def values(self):
         #Obtaining User Parameters
+        self.GranulometricDataParameter()
         granulometry = self.GranParameter()
+
         family = self.FamilyParameter()
         dc, cv, dp, Du, mu, qt, rho, rhos = self.BasicParameter()
-        optimization, variance = self.OptimizationParameter()
-        GranulometricData = self.GranulometricDataParameter()
-        
-        # Calculation of variables
-        n, k, r2 = DistrGranul(x_exp, y_exp, granulometry)
-        result = calc(cv, dc, dp, Du, granulometry, family, k, mu, n, phydro, qt, rho, rhos)
         
         #Saving as CSV
         f = open('results.csv', 'w', newline='', encoding='utf-8')  # 1. cria o arquivo
         w = csv.writer(f)                                           # 2. cria o objeto de gravação
-        w.writerow(["name", "value"])
-        w.writerow(["granulometry method", granulometry])
-        w.writerow(["family", family])
-        w.writerow(["n", float(n)])
-        w.writerow(["k", float(k)])
-        w.writerow(["R2", r2])
-        w.writerow(["Q", result[0]])
-        w.writerow(["Re", result[1]])
-        w.writerow(["d50", result[5]])
-        w.writerow(["E't", result[6]])
-        w.writerow(["Et", result[8]])
-        w.writerow(["Cvu", result[9]])
-        w.writerow(["n° hydrocyclon", result[15]])
+        w.writerow(["granulometry", "family", "Dc", "Du", "Q\u209C", "\u03BC", 
+        "\u0394P", "\u03C1", "\u03C1\u209B", "cv", "n", "k", "R²", "Q", "Re",
+        "d50", "E'T", "Et", "cvu", "Hydrocyclones in parallel", "Total equipment cost","Bare Module Cost"])
+
+        # Calculation of variables
+        n, k, r2 = DistrGranul(granulometry)
+        # for Sensitivity Analysis
+        if self.ui.radioButtonSensAna.isChecked():
+            result = parameterization(cv, dc, dp, Du, granulometry, family, k, mu, n, phydro, qt, rho, rhos, 4)
+            # Save results
+            for i in range(len(result)):
+                w.writerow([granulometry, family, result["dc"][i], result["Du"][i], qt, mu, 
+                result["dp"][i], rho, rhos, cv, float(n), float(k), r2, 3600*(result["Q"][i]), 
+                result["Re"][i], result["d50"][i], result["Et_red"][i], result["Et"][i], 
+                result["cvu"][i], result["n_hydro"][i], result["cp"][i], result["cbm"][i]])
+        # for Optimization
+        elif self.ui.radioButtonOptim.isChecked():
+            result = calc(cv, dc, dp, Du, granulometry, family, k, mu, n, phydro, qt, rho, rhos)
+            w.writerow([granulometry, family, dc, Du, qt, mu, dp, rho, rhos, cv,
+            float(n), float(k), r2, 3600*result[0], result[1], result[5], result[6], 
+            result[8], result[9], result[15], result[16], result[17]])
+        # for a simple calculation
+        else:
+            result = calc(cv, dc, dp, Du, granulometry, family, k, mu, n, phydro, qt, rho, rhos)
+            w.writerow([granulometry, family, dc, Du, qt, mu, dp, rho, rhos, cv,
+            float(n), float(k), r2, 3600*result[0], result[1], result[5], result[6], 
+            result[8], result[9], result[15], result[16], result[17]])
         return 
 
     def run(self):
@@ -153,8 +167,11 @@ class IntRes(QMainWindow):
     
 
     def results(self):
-        for i in range(10):
-            self.ui.tableWidget.setItem(0,i,QtWidgets.QTableWidgetItem(f"{float(y_res[i+2]):.2f}".center(25," ")))
+        data = pd.read_csv('results.csv', sep=',')
+        self.ui.tableWidget.setRowCount(len(np.array(data.iloc[:,0])))
+        for i in range(12):
+            for j in range(len(np.array(data.iloc[:,0]))):
+                self.ui.tableWidget.setItem(j,i,QtWidgets.QTableWidgetItem(f"{float(data.iloc[j,i+10]):.2f}".center(25," ")))
 
 
 
